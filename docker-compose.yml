@@ -14,6 +14,7 @@ services:
       - REDIS_DB=0
     depends_on:
       - redis
+    command: sh -c "sleep 5 && python hello.py" # Wait for Redis to start
 
   redis:
     image: "redis:5.0"
