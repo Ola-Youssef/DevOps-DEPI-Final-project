@@ -1,0 +1,15 @@
+version: '3'
+services:
+  web:
+    image: nooreisa/devops-challenge-app
+    ports:
+      - "80:80"  # This maps port 8080 on your host to port 80 in the container
+    environment:
+      - REDIS_PORT=6379  # Ensure this matches your Redis configuration
+      - REDIS_HOST=redis  # Name of the Redis service
+      - REDIS_DB=0        # Set a default Redis database
+      - PORT=80           # Set the port for the web application
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"

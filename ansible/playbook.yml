@@ -1,0 +1,69 @@
+- name: Deploy Docker Application on AWS EC2
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Gather facts
+      setup:
+
+    - name: Update apt and install required packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - docker.io
+        - python3-pip
+        - python3-venv
+        - python3-apt
+        - curl  # Ensure curl is installed
+        - git  # Optional: Install git if you need version control
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Create Python virtual environment
+      command: python3 -m venv /home/ubuntu/venv
+      args:
+        creates: /home/ubuntu/venv
+
+    - name: Install Docker Python module in virtual environment
+      command: /home/ubuntu/venv/bin/python -m pip install docker
+
+    - name: Create a directory for the application
+      file:
+        path: /home/ubuntu/app
+        state: directory
+
+    - name: Copy docker-compose.yml to EC2 instance
+      copy:
+        src: ./docker-compose.yml
+        dest: /home/ubuntu/app/docker-compose.yml
+
+    - name: Install Docker Compose
+      shell: >
+        curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+      args:
+        creates: /usr/local/bin/docker-compose
+
+    - name: Set permissions for Docker Compose
+      command: chmod +x /usr/local/bin/docker-compose
+
+    - name: Verify Docker Compose installation
+      command: docker-compose --version
+      register: docker_compose_version
+
+    - debug:
+        var: docker_compose_version.stdout
+
+    - name: Pull Docker images
+      command: docker-compose -f /home/ubuntu/app/docker-compose.yml pull
+      args:
+        chdir: /home/ubuntu/app
+
+    - name: Run Docker containers
+      command: docker-compose -f /home/ubuntu/app/docker-compose.yml up -d
+      args:
+        chdir: /home/ubuntu
