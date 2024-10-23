@@ -102,5 +102,5 @@ Copyright (c) 2019 by the Tradebyte Software GmbH.<br/>
 `DevOps-Challenge` is maintained and funded by the Tradebyte Software GmbH. <br/>
 The names and images for `DevOps-Challenge` are trademarks of the Tradebyte Software GmbH.
 
-We love free software!
+We love free software!!
 
