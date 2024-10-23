@@ -1,0 +1,58 @@
+pipeline {
+    agent any
+
+    stages {
+        // Stage to checkout the Terraform repository
+        stage('Checkout Terraform Repository') {
+            steps {
+                git branch: 'master', url: 'https://github.com/Maram-Hassan/new.git'
+            }
+        }
+
+        // Stage to install Terraform
+        stage('Install Terraform') {
+            steps {
+                sh '''
+                if ! [ -x "$(command -v terraform)" ]; then
+                  wget https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
+                  unzip terraform_1.5.0_linux_amd64.zip
+                  sudo mv terraform /usr/local/bin/
+                fi
+                '''
+            }
+        }
+
+        // Stage to initialize Terraform
+        stage('Terraform Init') {
+            steps {
+                withAWS(credentials: 'aws-credentials') {
+                    sh 'terraform init'
+                }
+            }
+        }
+
+        // Stage to plan the Terraform configuration
+        stage('Terraform Plan') {
+            steps {
+                withAWS(credentials: 'aws-credentials') {
+                    sh 'terraform plan'
+                }
+            }
+        }
+
+        // Stage to apply the Terraform configuration
+        stage('Terraform Apply') {
+            steps {
+                withAWS(credentials: 'aws-credentials') {
+                    sh 'terraform apply -auto-approve'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
