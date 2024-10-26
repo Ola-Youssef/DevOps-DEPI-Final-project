@@ -2,7 +2,7 @@
 
 This repository is meant to be used as a challenge for DevOps candidates at Tradebyte.
 
-You should fork/clone this repository to use as a basis for the challenge.
+You should fork/clone this repository to use as a basis for the challenge
 
 ## The challenge
 
